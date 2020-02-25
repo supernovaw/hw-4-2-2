@@ -48,7 +48,7 @@ public class ListViewActivity extends AppCompatActivity {
         for (int i = 0; i < content.length / 2; i++) {
             String text = content[i * 2 + 1];
             int wordsAmt = text.split(" ").length;
-            String length = String.format(getString(R.string.text_length), wordsAmt, text.length());
+            String length = getString(R.string.text_length, wordsAmt, text.length());
 
             HashMap<String, String> map = new HashMap<>(2);
             map.put(TITLE_KEY, content[i * 2]);
