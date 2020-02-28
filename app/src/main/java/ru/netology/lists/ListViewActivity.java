@@ -1,5 +1,6 @@
 package ru.netology.lists;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
@@ -18,6 +19,10 @@ public class ListViewActivity extends AppCompatActivity {
     private static final String TITLE_KEY = "title";
     private static final String SUBTITLE_KEY = "subtitle";
     private static final String LENGTH_KEY = "length";
+    private static final String EXCLUDED = "excluded";
+
+    private SharedPreferences sharedPreferences;
+    private ArrayList<Integer> excludedIndices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,25 +31,66 @@ public class ListViewActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        sharedPreferences = getPreferences(MODE_PRIVATE);
+        readExcludedIndices();
+
         ListView list = findViewById(R.id.list);
 
-        List<HashMap<String, String>> values = prepareContent();
+        List<HashMap<String, String>> originalValues = prepareContent();
+        List<HashMap<String, String>> values = new ArrayList<>(originalValues);
+        exclude(values);
 
         BaseAdapter listContentAdapter = createAdapter(values);
 
         list.setAdapter(listContentAdapter);
         list.setOnItemClickListener((adapterView, view, i, l) -> {
+            excludedIndices.add(originalValues.indexOf(values.get(i))); // cancel shift
             values.remove(i);
+            saveExcludedIndices();
             listContentAdapter.notifyDataSetChanged();
         });
 
         SwipeRefreshLayout refreshLayout = findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(() -> {
+            excludedIndices.clear();
             values.clear();
             values.addAll(prepareContent());
+            saveExcludedIndices();
             listContentAdapter.notifyDataSetChanged();
             refreshLayout.setRefreshing(false);
         });
+    }
+
+    private void readExcludedIndices() {
+        String data = sharedPreferences.getString(EXCLUDED, "");
+        excludedIndices = new ArrayList<>();
+        if (data != null && !data.isEmpty()) {
+            String[] split = data.split(";");
+            for (String s : split)
+                excludedIndices.add(Integer.parseInt(s));
+        }
+    }
+
+    private void saveExcludedIndices() {
+        StringBuilder toSave;
+        if (excludedIndices.isEmpty())
+            toSave = new StringBuilder();
+        else {
+            toSave = new StringBuilder(Integer.toString(excludedIndices.get(0)));
+            for (int i = 1; i < excludedIndices.size(); i++)
+                toSave.append(";").append(excludedIndices.get(i));
+        }
+        sharedPreferences.edit().putString(EXCLUDED, toSave.toString()).apply();
+    }
+
+    private void exclude(List<HashMap<String, String>> list) {
+        List<HashMap<String, String>> resultList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            if (!excludedIndices.contains(i))
+                resultList.add(list.get(i));
+        }
+        list.clear();
+        list.addAll(resultList);
     }
 
     @NonNull
