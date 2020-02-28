@@ -8,6 +8,7 @@ import android.widget.SimpleAdapter;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,18 @@ public class ListViewActivity extends AppCompatActivity {
         BaseAdapter listContentAdapter = createAdapter(values);
 
         list.setAdapter(listContentAdapter);
+        list.setOnItemClickListener((adapterView, view, i, l) -> {
+            values.remove(i);
+            listContentAdapter.notifyDataSetChanged();
+        });
+
+        SwipeRefreshLayout refreshLayout = findViewById(R.id.refreshLayout);
+        refreshLayout.setOnRefreshListener(() -> {
+            values.clear();
+            values.addAll(prepareContent());
+            listContentAdapter.notifyDataSetChanged();
+            refreshLayout.setRefreshing(false);
+        });
     }
 
     @NonNull
