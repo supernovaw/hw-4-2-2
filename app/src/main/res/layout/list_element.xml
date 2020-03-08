@@ -34,7 +34,16 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/deleteElementButton"
         app:layout_constraintEnd_toEndOf="@+id/elementText"
         app:layout_constraintTop_toBottomOf="@+id/elementText" />
+
+    <Button
+        android:id="@+id/deleteElementButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="削除"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/elementText" />
 </androidx.constraintlayout.widget.ConstraintLayout>
