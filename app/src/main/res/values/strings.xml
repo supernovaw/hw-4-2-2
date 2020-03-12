@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Lists</string>
     <string name="text_length">"%d words (%d chars)"</string>
+    <string name="no_title">Untitled</string>
+    <string name="delete_element">Delete</string>
+    <string name="add_element">Add a new element</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
