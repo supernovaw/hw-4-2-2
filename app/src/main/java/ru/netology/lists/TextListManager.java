@@ -83,14 +83,8 @@ public class TextListManager {
 	private static byte[] load() {
 		File f = new File(Environment.getExternalStoragePublicDirectory(
 				Environment.DIRECTORY_DOCUMENTS), TEXT_FILE);
-		FileInputStream in;
-		try {
-			in = new FileInputStream(f);
-		} catch (FileNotFoundException e) {
-			return null;
-		}
 
-		try {
+		try (FileInputStream in = new FileInputStream(f)) {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			int read;
 			byte[] buffer = new byte[4096];
@@ -100,15 +94,11 @@ public class TextListManager {
 
 			Log.v(LOG_TAG, "Loaded successfully");
 			return out.toByteArray();
-		} catch (IOException e) {
-			Log.w(LOG_TAG, "IOException while reading: " + e.getMessage());
+		} catch (FileNotFoundException e) {
 			return null;
-		} finally {
-			try {
-				in.close();
-			} catch (IOException e) {
-				Log.w(LOG_TAG, "IOException while closing: " + e.getMessage());
-			}
+		} catch (IOException e) {
+			Log.w(LOG_TAG, "IOException while loading: " + e.getMessage());
+			return null;
 		}
 	}
 
@@ -120,24 +110,13 @@ public class TextListManager {
 					" because this path is occupied by a folder");
 			return;
 		}
-		FileOutputStream out;
-		try {
-			out = new FileOutputStream(f);
-		} catch (FileNotFoundException e) {
-			Log.v(LOG_TAG, "Can't save: " + e.getMessage());
-			return;
-		}
-		try {
+		try (FileOutputStream out = new FileOutputStream(f)) {
 			out.write(bs);
 			Log.v(LOG_TAG, "Saved successfully");
+		} catch (FileNotFoundException e) {
+			Log.w(LOG_TAG, "Can't save:" + e.getMessage());
 		} catch (IOException e) {
-			Log.w(LOG_TAG, "IOException while writing: " + e.getMessage());
-		} finally {
-			try {
-				out.close();
-			} catch (IOException e) {
-				Log.w(LOG_TAG, "IOException while writing: " + e.getMessage());
-			}
+			Log.w(LOG_TAG, "IOException while saving: " + e.getMessage());
 		}
 	}
 
